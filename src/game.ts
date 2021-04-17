@@ -172,10 +172,31 @@ export class Game extends CancelableEventEmitter {
    */
   play(card: Card, { silent } = { silent: false }) {
     const currentPlayer = this._currentPlayer;
+    const drawingPlayers = [];
     if (!card) return;
     // check if player has the card at hand...
     if (!currentPlayer.hasCard(card))
       throw new Error(`${currentPlayer} does not have card ${card} at hand`);
+
+    // Users that didn't yell UNO! on their last card
+    const nonUnoPlayers = this._players.filter(p => p.hand.length == 1 && !this.yellers[p.name]);
+    for (const p of nonUnoPlayers) {
+      drawingPlayers.push(p);
+    }
+
+    for (const p of drawingPlayers) {
+        //Add 2 new cards
+        this.privateDraw(p, 2);
+    }
+
+   // Check if the currentPlayer is included in drawingPlayers
+    let isUserIncluded = drawingPlayers.find(p => p.name === currentPlayer.name);
+
+    // If there is
+    if (isUserIncluded) {
+        this.goToNextPlayer();
+        return drawingPlayers;
+    }
 
     if (
       !silent &&
