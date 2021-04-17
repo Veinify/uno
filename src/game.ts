@@ -266,7 +266,7 @@ export class Game extends CancelableEventEmitter {
     yellingPlayer = yellingPlayer || this._currentPlayer;
 
     // the users that will draw;
-    const drawingPlayers;
+    const drawingPlayers = [];
 
     // if player is the one who has 1 card, just mark as yelled
     // (he may yell UNO! before throwing his card, so he may have
