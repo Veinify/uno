@@ -190,7 +190,7 @@ export class Game extends CancelableEventEmitter {
     }
 
    // Check if the currentPlayer is included in drawingPlayers
-    let isUserIncluded = drawingPlayers.find(p => p.name === currentPlayer.name);
+    const isUserIncluded = drawingPlayers.find(p => p.name === currentPlayer.name);
 
     // If there is
     if (isUserIncluded) {
@@ -266,7 +266,7 @@ export class Game extends CancelableEventEmitter {
     yellingPlayer = yellingPlayer || this._currentPlayer;
 
     // the users that will draw;
-    let drawingPlayers;
+    const drawingPlayers;
 
     // if player is the one who has 1 card, just mark as yelled
     // (he may yell UNO! before throwing his card, so he may have
