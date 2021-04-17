@@ -277,15 +277,9 @@ export class Game extends CancelableEventEmitter {
     } else {
       // else if the user has already yelled or if he has more than 2 cards...
 
-      // is there anyone with 1 card at hand that did not yell uno?
-      drawingPlayers = this._players.filter(
-        (p) => p.hand.length == 1 && !this.yellers[p.name],
-      );
-
-      // if there isn't anyone...
       if (drawingPlayers.length == 0) {
         // the player was lying, so he will draw
-        drawingPlayers = [yellingPlayer];
+        drawingPlayers.push(yellingPlayer);
       }
     }
 
