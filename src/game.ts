@@ -265,6 +265,10 @@ export class Game extends CancelableEventEmitter {
   uno(yellingPlayer?: Player) {
     yellingPlayer = yellingPlayer || this._currentPlayer;
 
+    if (yellingPlayer.hand.length == 1) {
+        return throw new Error('The player cannot yell uno! when they only got one card left');
+    }
+
     // the users that will draw;
     const drawingPlayers = [];
 
@@ -277,7 +281,7 @@ export class Game extends CancelableEventEmitter {
     } else {
       // else if the user has already yelled or if he has more than 2 cards...
 
-      if (drawingPlayers.length == 0) {
+      if (yellingPlayer.hand.length > 2) {
         // the player was lying, so he will draw
         drawingPlayers.push(yellingPlayer);
       }
@@ -286,7 +290,7 @@ export class Game extends CancelableEventEmitter {
     drawingPlayers.forEach((p) => this.privateDraw(p, 2));
 
     // return who drawn
-    return drawingPlayers;
+    return drawingPlayers.length !== 0 ? drawingPlayers : null;
   }
 
   fixPlayers(playerNames: string[]) {
