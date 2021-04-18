@@ -178,26 +178,6 @@ export class Game extends CancelableEventEmitter {
     if (!currentPlayer.hasCard(card))
       throw new Error(`${currentPlayer} does not have card ${card} at hand`);
 
-    // Users that didn't yell UNO! on their last card
-    const nonUnoPlayers = this._players.filter(p => p.hand.length == 1 && !this.yellers[p.name]);
-    for (const p of nonUnoPlayers) {
-      drawingPlayers.push(p);
-    }
-
-    for (const p of drawingPlayers) {
-        //Add 2 new cards
-        this.privateDraw(p, 2);
-    }
-
-   // Check if the currentPlayer is included in drawingPlayers
-    const isUserIncluded = drawingPlayers.find(p => p.name === currentPlayer.name);
-
-    // If there is
-    if (isUserIncluded) {
-        this.goToNextPlayer();
-        return drawingPlayers;
-    }
-
     if (
       !silent &&
       !this.dispatchEvent(new BeforeCardPlayEvent(card, this._currentPlayer))
@@ -222,6 +202,12 @@ export class Game extends CancelableEventEmitter {
       return;
 
     if (currentPlayer.hand.length == 0) {
+      // The user forgot to yell uno, they will not win and will get an extra two penalty cards
+      if (!this.yellers[currentPlayer.name]) {
+          drawingPlayers.push(currentPlayer.name);
+          this.privateDraw(currentPlayer, 2);
+          return drawingPlayers;
+      }
       const score = this.calculateScore();
       // game is over, we have a winner!
       this.dispatchEvent(new GameEndEvent(this._currentPlayer, score));
