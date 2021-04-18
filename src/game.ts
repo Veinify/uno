@@ -206,6 +206,7 @@ export class Game extends CancelableEventEmitter {
       if (!this.yellers[currentPlayer.name]) {
           drawingPlayers.push(currentPlayer.name);
           this.privateDraw(currentPlayer, 2);
+          this.goToNextPlayer();
           return drawingPlayers;
       }
       const score = this.calculateScore();
@@ -251,8 +252,9 @@ export class Game extends CancelableEventEmitter {
   uno(yellingPlayer?: Player) {
     yellingPlayer = yellingPlayer || this._currentPlayer;
 
-    if (yellingPlayer.hand.length == 1)
-        throw new Error('The player cannot yell uno! when they only got one card left')
+    if (this.yellers[yellingPlayer.name]) {
+      throw new Error('User already yell uno!')
+    }
 
     // the users that will draw;
     const drawingPlayers = [];
@@ -263,19 +265,15 @@ export class Game extends CancelableEventEmitter {
     if (yellingPlayer.hand.length <= 2 && !this.yellers[yellingPlayer.name]) {
       this.yellers[yellingPlayer.name] = true;
       return [];
-    } else {
-      // else if the user has already yelled or if he has more than 2 cards...
-
-      if (yellingPlayer.hand.length > 2) {
-        // the player was lying, so he will draw
-        drawingPlayers.push(yellingPlayer);
-      }
+    } else if (yellingPlayer.hand.length > 2) {
+      // If the player have more than two cards
+      // the player was lying, so he will draw
+      drawingPlayers.push(yellingPlayer);
     }
-
     drawingPlayers.forEach((p) => this.privateDraw(p, 2));
 
     // return who drawn
-    return drawingPlayers.length !== 0 ? drawingPlayers : null;
+    return drawingPlayers.length > 0 ? drawingPlayers : null;
   }
 
   fixPlayers(playerNames: string[]) {
