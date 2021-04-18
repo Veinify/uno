@@ -45,6 +45,14 @@ export class Game extends CancelableEventEmitter {
    * value: true/false
    */
   private yellers: { [key: string]: boolean } = {};
+  
+  /**
+   * Users who misused uno yell will have a cooldown of 20 seconds before yelling again
+   *
+   * key: player name
+   * value: date in ms
+   */
+   private falseYellCd: { [key: string]: number } = {};
 
   constructor(playerNames: string[], houseRules: { setup: Function }[] = []) {
     super();
@@ -255,6 +263,11 @@ export class Game extends CancelableEventEmitter {
     if (this.yellers[yellingPlayer.name]) {
       throw new Error('User already yell uno!')
     }
+    
+    if (!isNaN(this.falseYellCd[yellingPlayer.name])) {
+        if ((this.falseYellCd[yellingPlayer.name] + 30000) > Date.now())
+            throw new Error('User did a false yell before, therefore they have a 20 seconds cooldown until they can yell uno again.')
+    }
 
     // the users that will draw;
     const drawingPlayers = [];
@@ -269,6 +282,7 @@ export class Game extends CancelableEventEmitter {
       // If the player have more than two cards
       // the player was lying, so he will draw
       drawingPlayers.push(yellingPlayer);
+      this.falseYellCd[yellingPlayer.name] = Date.now();
     }
     drawingPlayers.forEach((p) => this.privateDraw(p, 2));
 
